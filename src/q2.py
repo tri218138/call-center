@@ -33,3 +33,5 @@ max_nc += x
 nc = [y+x for y in nc]
 day_off = [0]*nd
 CSR_by_week = CSR_by_shift
+for cnt in range(1, x+1):
+    CSR_name = 'NV'+int(CSRs[-1][2:])+cnt
