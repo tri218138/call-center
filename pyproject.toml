@@ -10,6 +10,7 @@ packages = [{ include = "call_center" }]
 python = "^3.9,<3.12"
 scipy = "^1.10.1"
 numpy = "^1.24.2"
+pandas = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
