@@ -57,10 +57,17 @@ for j in range(0, nd):
     empty_slot = max_nc - nc[j]
 
     # move shift down
-    for i in range(0,max_nc-first_off_of_day-empty_slot):
-        CSR = r_CSRs[i]
-        ref_CSR = r_CSRs[i+empty_slot]
-        CSR_by_week[CSR][j]=CSR_by_week[ref_CSR][j]
+    if (first_off_of_day+empty_slot <= max_nc):
+        for i in range(0,max_nc-first_off_of_day-empty_slot):
+            CSR = r_CSRs[i]
+            ref_CSR = r_CSRs[i+empty_slot]
+            CSR_by_week[CSR][j]=CSR_by_week[ref_CSR][j]
+    else:
+        for i in range(max_nc-first_off_of_day, 2*max_nc - first_off_of_day - empty_slot):
+            CSR = r_CSRs[i]
+            ref_CSR = r_CSRs[i+(first_off_of_day+empty_slot)-max_nc]
+            CSR_by_week[CSR][j]=CSR_by_week[ref_CSR][j]
+   
     # add 'None' to appropriate slot
     for i in range(0, empty_slot):
         off_CSR = CSRs[(first_off_of_day+i) % max_nc]
