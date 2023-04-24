@@ -2,24 +2,28 @@
 Task 3: Scheduling CSR for 1 week, maximize workload fairness
 """
 import itertools
+import json
 import math
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from scipy.optimize import linprog
+from scipy.optimize import linprog, OptimizeResult
 
 from task3_domain import CsrRequirePerDayDetails, ShiftSpanDetail, RawSchedule, ProblemInput
 
 
+HOME_PATH = Path(__file__).parent.parent
+
+
 def main():
-    csr_day_file = Path("data\json\days.json")
+    csr_day_file = HOME_PATH / "data" / "json" / "days.json"
     csr_requirement_per_day = CsrRequirePerDayDetails.from_json_file(csr_day_file)
 
-    shifts_detail_file = Path("data\json\shifts.json")
+    shifts_detail_file = HOME_PATH / "data" / "json" / "shifts.json"
     shifts_detail = ShiftSpanDetail.from_json_file(shifts_detail_file)
 
-    output2_file = Path("expect\output2.json")
+    output2_file = HOME_PATH / "expect" / "output2.json"
     raw_schedules = RawSchedule.from_json_file(output2_file)
 
     solve_lp_problem(
@@ -51,8 +55,7 @@ def solve_lp_problem(problem_input: ProblemInput):
 
     result = linprog(coefficients_c, total_a_ub, total_b_ub, integrality=1)
 
-    dataframe_result = convert_to_pandas(result.x, problem_input)
-    print(dataframe_result)
+    write_result(result, problem_input)
 
 
 def get_matrix_for_condition_one_shift_per_day(
@@ -251,6 +254,20 @@ def convert_to_pandas(solution: np.array, problem_input: ProblemInput) -> pd.Dat
         parsed_result.iloc[csr_i, day_j] = shift_names[shift_k]
 
     return parsed_result
+
+
+def write_result(result: OptimizeResult, problem_input: ProblemInput):
+    dataframe_result = convert_to_pandas(result.x, problem_input)
+
+    result_dict = {}
+    transpose_result = dataframe_result.transpose()
+    for column in transpose_result:
+        result_dict[column] = [
+            None if item == "" else item for item in transpose_result[column].values
+        ]
+
+    with open(HOME_PATH / "output" / "output3.json", "w") as output_json_file:
+        json.dump(result_dict, output_json_file)
 
 
 if __name__ == "__main__":
