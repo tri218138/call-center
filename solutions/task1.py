@@ -60,5 +60,5 @@ for j in range(len(J)):
 
 output = json.dumps(assign)
 
-with open("./data/json/output1.json", "w") as outfile:
+with open("output\output1.json", "w") as outfile:
     outfile.write(output)

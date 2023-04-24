@@ -7,7 +7,7 @@ from math import ceil
 ######################################################################################
 
 # Import data
-file = open('../data/json/output1.json')
+file = open('expect\output1.json')
 CSR_by_shift = json.load(file)
 
 ######################################################################################
@@ -79,11 +79,11 @@ for j in range(0, nd):
 
 # Print output to "../out/output2.json"
 ## intitially print output (all in 1 line)
-with open("../out/output2.json", "w") as f:
+with open("output\output2.json", "w") as f:
     json.dump(CSR_by_week, f, indent=None)
 
 ## read the file contents and modify them (each NV on 1 line)
-with open("../out/output2.json", "r") as f:
+with open("output\output2.json", "r") as f:
     contents = f.read()
     # Replace newlines with ',\n' except for lines that contain a list value
     contents = contents.replace('], ', '],\n\t')
@@ -92,5 +92,5 @@ with open("../out/output2.json", "r") as f:
     # print(contents)
 
 ## overwrite the file with the modified contents
-with open("../out/output2.json", "w") as f:
+with open("output\output2.json", "w") as f:
     f.write(contents)

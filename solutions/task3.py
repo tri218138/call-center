@@ -13,13 +13,13 @@ from task3_domain import CsrRequirePerDayDetails, ShiftSpanDetail, RawSchedule, 
 
 
 def main():
-    csr_day_file = Path("./../data/json/days.json")
+    csr_day_file = Path("data\json\days.json")
     csr_requirement_per_day = CsrRequirePerDayDetails.from_json_file(csr_day_file)
 
-    shifts_detail_file = Path("./../data/json/shifts.json")
+    shifts_detail_file = Path("data\json\shifts.json")
     shifts_detail = ShiftSpanDetail.from_json_file(shifts_detail_file)
 
-    output2_file = Path("./../data/json/output2.json")
+    output2_file = Path("expect\output2.json")
     raw_schedules = RawSchedule.from_json_file(output2_file)
 
     solve_lp_problem(
