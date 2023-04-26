@@ -8,15 +8,15 @@ import numpy as np
 
 
 class CsrRequirePerDayDetails:
-    def __init__(self, input_file: Path):
-        with open(input_file, "r") as input_json:
-            parsed_input = json.load(input_json)
-            self._day_of_week_names = list(parsed_input.keys())
-            self._csr_requirements_per_day = np.array(list(parsed_input.values()))
+    def __init__(self, input_dict: Dict[str, List[int]]):
+        self._day_of_week_names = list(input_dict.keys())
+        self._csr_requirements_per_day = np.array(list(input_dict.values()))
 
     @staticmethod
     def from_json_file(file_name: Path):
-        return CsrRequirePerDayDetails(file_name)
+        with open(file_name, "r") as input_json:
+            parsed_input = json.load(input_json)
+        return CsrRequirePerDayDetails(parsed_input)
 
     @property
     def num_of_day_per_week(self) -> int:
@@ -37,16 +37,15 @@ class CsrRequirePerDayDetails:
 
 
 class ShiftSpanDetail:
-    def __init__(self, input_file: Path):
-        with open(input_file, "r") as input_file:
-            parsed_input: Dict[str, List[int]] = json.load(input_file)
-
-            self._shift_names = parsed_input.keys()
-            self._period_detail_matrix = np.array(list(parsed_input.values()))
+    def __init__(self, input_dict: Dict[str, List[int]]):
+        self._shift_names = input_dict.keys()
+        self._period_detail_matrix = np.array(list(input_dict.values()))
 
     @staticmethod
     def from_json_file(file_name: Path):
-        return ShiftSpanDetail(file_name)
+        with open(file_name, "r") as input_file:
+            parsed_input: Dict[str, List[int]] = json.load(input_file)
+        return ShiftSpanDetail(parsed_input)
 
     @property
     def num_of_available_shifts(self) -> int:
@@ -60,15 +59,14 @@ class ShiftSpanDetail:
 
 
 class RawSchedule:
-    def __init__(self, input_file: Path):
-        with open(input_file, "r") as input_json:
-            self._input_schedule: Dict[str, List[Optional[str]]] = json.load(input_json)
+    def __init__(self, input_dict: Dict[str, List[Optional[str]]]):
+        self._input_schedule = input_dict
 
     @staticmethod
     def from_json_file(file_name: Path):
-        return RawSchedule(file_name)
-    
-    
+        with open(file_name, "r") as input_file:
+            input_dict = json.load(input_file)
+        return RawSchedule(input_dict)
 
     def __repr__(self):
         return str(self._input_schedule)
