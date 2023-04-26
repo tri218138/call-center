@@ -5,7 +5,7 @@ import pandas as pd
 from scipy.optimize import linprog
 from pathlib import Path
 
-from task1_domain import CSRInquiries, ShiftsDetail, ReadJson
+from solutions.task1_domain import CSRInquiries, ShiftsDetail, ReadJson
 
 
 def solve(
@@ -17,7 +17,7 @@ def solve(
 
     coefficients_c = np.ones(shifts_detail.num_of_shifts)
     stat = [
-        min_csr_of_a_day(coefficients_c, csr_inquiries, shifts_detail, day_j)
+        min_csr_of_a_day(coefficients_c, csr_inquiries, shifts_detail, day_j).tolist()
         for day_j in range(csr_inquiries.num_of_days)
     ]
 
@@ -32,16 +32,14 @@ def solve(
 
 def min_csr_of_a_day(
     coefficients_c: np.ndarray, csr_inquiries: CSRInquiries, shifts_detail: ShiftsDetail, day_j: int
-):
+) -> np.ndarray:
     constraint_matrix, constraint_vector = constraint_min_CSR_of_a_period(
         csr_inquiries, shifts_detail, day_j
     )
     return (
         linprog(coefficients_c, constraint_matrix, constraint_vector, integrality=3)
         .x.astype(int)
-        .tolist()
     )
-
 
 def constraint_min_CSR_of_a_period(
     csr_inquiries: CSRInquiries, shifts_detail: ShiftsDetail, at: int
@@ -50,20 +48,11 @@ def constraint_min_CSR_of_a_period(
     constraint_vector = -1 * csr_inquiries._csr_inquiries[at]
     return constraint_matrix.T, constraint_vector
 
-
-# def show_pandas(result, col, row):
-#     stat = pd.DataFrame(np.array(result), columns=col, index=row, dtype=int)
-#     stat["Total"] = stat.sum(axis=1)
-#     return stat
-
-
 def label_shift_to_employee(row: List[int], label: List[str], min_total_csr: int):
     assert len(row) == len(label)
     csr_per_day = reduce(lambda pre, cur: pre + cur, row, 0)
     label = [[name] * x for x, name in zip(row, label)] + [(min_total_csr - csr_per_day) * [None]]
     return reduce(lambda pre, cur: pre + cur, label, [])
-
-
 
 if __name__ == "__main__":
 

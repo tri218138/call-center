@@ -10,7 +10,7 @@ def solve(CSR_by_shift: Dict[str, List[Optional[str]]]):
     ######################################################################################
 
     # Set total working days per week
-    nd = 7
+    nd = len(list(CSR_by_shift.values())[0])
 
     ######################################################################################
 
@@ -21,7 +21,7 @@ def solve(CSR_by_shift: Dict[str, List[Optional[str]]]):
     ######################################################################################
 
     # Calculate number of CSR each day & total empty slot
-    nc = [0] * 7
+    nc = [0] * nd
     ne = 0
     for j in range(0, nd):
         empty_slot = [CSR for CSR in CSRs if CSR_by_shift[CSR][j] == None]

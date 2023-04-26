@@ -10,7 +10,12 @@ from typing import Dict, List, Optional
 import numpy as np
 import pandas as pd
 from scipy.optimize import OptimizeResult, linprog
-from solutions.task3_domain import CsrRequirePerDayDetails, ProblemInput, RawSchedule, ShiftSpanDetail
+from solutions.task3_domain import (
+    CsrRequirePerDayDetails,
+    ProblemInput,
+    RawSchedule,
+    ShiftSpanDetail,
+)
 
 
 def main():
@@ -59,8 +64,8 @@ def solve(
     a_ub3, b_ub3 = get_matrix_for_condition_csr_num_required_per_period(problem_input)
     a_ub4, b_ub4 = get_matrix_for_condition_csr_must_be_scheduled_fairly(problem_input)
 
-    total_a_ub = np.concatenate((a_ub1, a_ub2, a_ub3, a_ub4))
-    total_b_ub = np.concatenate((b_ub1, b_ub2, b_ub3, b_ub4))
+    total_a_ub = np.concatenate((a_ub1, a_ub3, a_ub4))
+    total_b_ub = np.concatenate((b_ub1, b_ub3, b_ub4))
 
     result = linprog(coefficients_c, total_a_ub, total_b_ub, integrality=1)
     print(result)
@@ -123,7 +128,7 @@ def get_matrix_for_condition_one_day_off_per_week(
             in_eq_constraint_matrix[processing_row, optimized_var_loc] = 1
 
     in_eq_constraint_vector = np.repeat(
-        problem_input.num_of_day_per_week_j - 1, problem_input.num_of_csr_i
+        problem_input.num_of_day_per_week_j, problem_input.num_of_csr_i
     )
 
     return in_eq_constraint_matrix, in_eq_constraint_vector
