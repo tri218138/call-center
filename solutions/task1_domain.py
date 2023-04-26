@@ -18,15 +18,17 @@ class CSRInquiries:
         self._csr_inquiries = np.array(list(table.values()))
 
     @staticmethod
-    def from_json_file(input_file: TextIO):
-        parsed_input: Dict[str, List[int]] = json.load(input_file)
-        return CSRInquiries(parsed_input)
+    def read_json(input_file: Path):
+        with open(input_file, "r") as input_json:
+            parsed_input: Dict[str, List[int]] = json.load(input_json)
+            return CSRInquiries(parsed_input)
 
     @property
     def num_of_days(self) -> int:
         return self._csr_inquiries.shape[0]
 
-    def get_list_of_day_names(self) -> List[str]:
+    @property
+    def day_names(self) -> List[str]:
         return self._day_names
 
     @property
@@ -61,9 +63,10 @@ class ShiftsDetail:
         self._shifts_detail = np.array(list(table.values()))
 
     @staticmethod
-    def read_json(input_file: TextIO):
-        parsed_input: Dict[str, List[int]] = json.load(input_file)
-        return ShiftsDetail(parsed_input)
+    def read_json(input_file: Path):
+        with open(input_file, "r") as input_json:
+            parsed_input: Dict[str, List[int]] = json.load(input_json)
+            return ShiftsDetail(parsed_input)
 
     @property
     def num_of_shifts(self) -> int:
@@ -72,9 +75,9 @@ class ShiftsDetail:
     def get_list_of_shift_names(self) -> List[str]:
         return self._shifts_name
 
-    # @property
-    # def columns(self) -> List[str]:
-    #     return self._shifts_name
+    @property
+    def columns(self) -> List[str]:
+        return self._shifts_name
 
     def to_dataframe(self):
         return pd.DataFrame(self._shifts_detail.transpose(), columns=self._shifts_name)
@@ -103,6 +106,27 @@ class Schedule:
     @property
     def num_of_days(self) -> int:
         return self._schedule.shape[1]
+    
+class ReadJson:
+    SHIFT_FILE_NAME = "shifts.json"
+    DAY_FILE_NAME = "days.json"
+    SCHEDULE_FILE_NAME = "shift.json"
+
+    def __init__(self, data_folder_path: Path) -> None:
+        self.data_folder_path = data_folder_path
+
+    def read_shifts(self) -> Dict[str, List[int]]:
+        with open(self.data_folder_path / self.SHIFT_FILE_NAME) as input_json:
+            return json.load(input_json)
+        
+    def read_days(self) -> Dict[str, List[int]]:
+        with open(self.data_folder_path / self.DAY_FILE_NAME) as input_json:
+            return json.load(input_json)
+        
+    def read_schedule(self) -> Dict[str, List[str]]:
+        with open(self.data_folder_path / self.SCHEDULE_FILE_NAME) as input_json:
+            return json.load(input_json)
+            
 
 
 class ProblemInput:
