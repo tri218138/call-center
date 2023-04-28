@@ -27,7 +27,7 @@ def solve(
         [label_shift_to_employee(shift, shifts_detail.columns, min_total_csr) for shift in stat]
     ).T.tolist()
 
-    return {f"NV{i}": em for i, em in enumerate(employee_assignment)}
+    return {f"NV{i + 1}": em for i, em in enumerate(employee_assignment)}
 
 
 def min_csr_of_a_day(
