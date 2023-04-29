@@ -5,11 +5,12 @@ import json
 from math import ceil
 from typing import List, Dict, Optional
 import pathlib
-try:
-    from solutions.utility import write_output_to_file
-except:
-    from utility import write_output_to_file
-    
+from solutions.utility import write_output_to_file
+# try:
+#     from solutions.utility import write_output_to_file
+# except:
+#     from utility import write_output_to_file
+
 HOME_PATH = pathlib.Path(__file__).parent.parent
 
 def solve(CSR_by_shift: Dict[str, List[Optional[str]]]):

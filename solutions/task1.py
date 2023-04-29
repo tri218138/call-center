@@ -6,12 +6,14 @@ from scipy.optimize import linprog
 from pathlib import Path
 import json
 import pathlib
-try:
-    from solutions.utility import write_output_to_file
-    from solutions.task1_domain import CSRInquiries, ShiftsDetail, ReadJson
-except:
-    from utility import write_output_to_file
-    from task1_domain import CSRInquiries, ShiftsDetail, ReadJson
+from solutions.utility import write_output_to_file
+from solutions.task1_domain import CSRInquiries, ShiftsDetail, ReadJson
+# try:
+#     from solutions.utility import write_output_to_file
+#     from solutions.task1_domain import CSRInquiries, ShiftsDetail, ReadJson
+# except:
+#     from utility import write_output_to_file
+#     from task1_domain import CSRInquiries, ShiftsDetail, ReadJson
 
 HOME_PATH = pathlib.Path(__file__).parent.parent
 
@@ -61,8 +63,7 @@ def label_shift_to_employee(row: List[int], label: List[str], min_total_csr: int
     label = [[name] * x for x, name in zip(row, label)] + [(min_total_csr - csr_per_day) * [None]]
     return reduce(lambda pre, cur: pre + cur, label, [])
 
-if __name__ == "__main__":
-
+def main():
     read_json = ReadJson(HOME_PATH / "data" / "json")
     shifts_dict = read_json.read_shifts()
     day_dict = read_json.read_days()
@@ -70,3 +71,5 @@ if __name__ == "__main__":
     CSR_by_shift = solve(shifts_dict, day_dict)
 
     write_output_to_file(HOME_PATH / "output" / "output1.json", CSR_by_shift)
+if __name__ == "__main__":
+    main()

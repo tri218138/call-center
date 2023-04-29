@@ -10,13 +10,15 @@ from typing import Dict, List, Optional
 import numpy as np
 import pandas as pd
 from scipy.optimize import OptimizeResult, linprog
-try:
-    from solutions.task3_domain import CsrRequirePerDayDetails, ProblemInput, RawSchedule, ShiftSpanDetail
-    from solutions.utility import write_output_to_file
-except:
-    from task3_domain import CsrRequirePerDayDetails, ProblemInput, RawSchedule, ShiftSpanDetail
-    from utility import write_output_to_file
-    
+from solutions.task3_domain import CsrRequirePerDayDetails, ProblemInput, RawSchedule, ShiftSpanDetail
+from solutions.utility import write_output_to_file
+# try:
+#     from solutions.task3_domain import CsrRequirePerDayDetails, ProblemInput, RawSchedule, ShiftSpanDetail
+#     from solutions.utility import write_output_to_file
+# except:
+#     from task3_domain import CsrRequirePerDayDetails, ProblemInput, RawSchedule, ShiftSpanDetail
+#     from utility import write_output_to_file
+
 def main():
     HOME_PATH = pathlib.Path(__file__).parent.parent
 
