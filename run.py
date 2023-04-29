@@ -3,6 +3,7 @@ import sys
 from solutions import task1 as sol_task1, task2 as sol_task2, task3 as sol_task3
 from evaluation import task1 as eval_task1, task2 as eval_task2, task3 as eval_task3, task4 as eval_task4
 import pathlib
+from data.json import gen_json
 
 HOME_PATH = pathlib.Path(__file__).parent
 
@@ -19,12 +20,17 @@ def run_test():
         print("============================================")
     except:
         print("Check your command line")
+
+def run_gen():
+    gen_json.main()
+
 def main():
     program = [sol_task1, sol_task2, sol_task3]
     for idx, prog in enumerate(program):
         print(f"Checking the output of task{idx + 1} from output/output{idx + 1}.json")
         prog.main()
         print("============================================")
+    subprocess.call(['python', 'notebook.py'])
 
 if __name__ == '__main__':
     print("""
@@ -36,5 +42,7 @@ if __name__ == '__main__':
     """)
     if "test" in sys.argv:
         run_test()
+    elif "gen" in sys.argv:
+        run_gen()
     else:
         main()

@@ -71,7 +71,6 @@ def solve(
     total_b_ub = np.concatenate((b_ub1, b_ub2, b_ub3, b_ub4))
 
     result = linprog(coefficients_c, total_a_ub, total_b_ub, integrality=1)
-    # print(result)
 
     return convert_result_to_dict(result, problem_input)
 
