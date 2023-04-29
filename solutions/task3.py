@@ -10,14 +10,14 @@ from typing import Dict, List, Optional
 import numpy as np
 import pandas as pd
 from scipy.optimize import OptimizeResult, linprog
-from solutions.task3_domain import CsrRequirePerDayDetails, ProblemInput, RawSchedule, ShiftSpanDetail
+from task3_domain import CsrRequirePerDayDetails, ProblemInput, RawSchedule, ShiftSpanDetail
 
 
 def main():
     HOME_PATH = pathlib.Path(__file__).parent.parent
 
     csr_day_file_path = HOME_PATH / "data" / "json" / "days.json"
-    print(csr_day_file_path)
+    # print(csr_day_file_path)
     with open(csr_day_file_path) as csr_day_file:
         csr_requirement_per_day = json.load(csr_day_file)
 
@@ -63,7 +63,7 @@ def solve(
     total_b_ub = np.concatenate((b_ub1, b_ub2, b_ub3, b_ub4))
 
     result = linprog(coefficients_c, total_a_ub, total_b_ub, integrality=1)
-    print(result)
+    # print(result)
 
     return convert_result_to_dict(result, problem_input)
 
@@ -243,7 +243,7 @@ def convert_i_j_k_to_1d_arr_loc(
 def convert_result_to_dict(
     result: OptimizeResult, problem_input: ProblemInput
 ) -> Dict[str, List[Optional[str]]]:
-    print(result.x)
+    # print(result.x)
     dataframe_result = convert_to_pandas(result.x, problem_input)
 
     result_dict = {}

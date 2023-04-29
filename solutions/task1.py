@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import linprog
 from pathlib import Path
-
-from solutions.task1_domain import CSRInquiries, ShiftsDetail, ReadJson
+import json
+from task1_domain import CSRInquiries, ShiftsDetail, ReadJson
 
 
 def solve(
@@ -59,4 +59,23 @@ if __name__ == "__main__":
     read_json = ReadJson(Path("data/json"))
     shifts_dict = read_json.read_shifts()
     day_dict = read_json.read_days()
-    print(solve(shifts_dict, day_dict))
+    
+    CSR_by_shift = solve(shifts_dict, day_dict)
+
+    # Print output to "../out/output2.json"
+    ## intitially print output (all in 1 line)
+    with open("output\output1.json", "w") as f:
+        json.dump(CSR_by_shift, f, indent=None)
+
+    ## read the file contents and modify them (each NV on 1 line)
+    with open("output\output1.json", "r") as f:
+        contents = f.read()
+        # Replace newlines with ',\n' except for lines that contain a list value
+        contents = contents.replace("], ", "],\n\t")
+        contents = contents.replace("{", "{\n\t")
+        contents = contents.replace("]}", "]\n}")
+        # print(contents)
+
+    ## overwrite the file with the modified contents
+    with open("output\output1.json", "w") as f:
+        f.write(contents)
