@@ -3,7 +3,6 @@ from collections import defaultdict
 from dataclasses import field, dataclass
 from pathlib import Path
 from typing import Optional, List, Dict, TextIO
-
 import numpy as np
 import pandas as pd
 

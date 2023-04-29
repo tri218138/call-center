@@ -4,7 +4,13 @@
 import json
 from math import ceil
 from typing import List, Dict, Optional
-
+import pathlib
+try:
+    from solutions.utility import write_output_to_file
+except:
+    from utility import write_output_to_file
+    
+HOME_PATH = pathlib.Path(__file__).parent.parent
 
 def solve(CSR_by_shift: Dict[str, List[Optional[str]]]):
     ######################################################################################
@@ -77,31 +83,15 @@ def solve(CSR_by_shift: Dict[str, List[Optional[str]]]):
 
 def main():
     # Import data
-    file = open("expect\output1.json")
+    
+    file = open(HOME_PATH / "output" / "output1.json")
     CSR_by_shift = json.load(file)
 
     CSR_by_week = solve(CSR_by_shift)
 
     ######################################################################################
 
-    # Print output to "../out/output2.json"
-    ## intitially print output (all in 1 line)
-    with open("output\output2.json", "w") as f:
-        json.dump(CSR_by_week, f, indent=None)
-
-    ## read the file contents and modify them (each NV on 1 line)
-    with open("output\output2.json", "r") as f:
-        contents = f.read()
-        # Replace newlines with ',\n' except for lines that contain a list value
-        contents = contents.replace("], ", "],\n\t")
-        contents = contents.replace("{", "{\n\t")
-        contents = contents.replace("]}", "]\n}")
-        # print(contents)
-
-    ## overwrite the file with the modified contents
-    with open("output\output2.json", "w") as f:
-        f.write(contents)
-
+    write_output_to_file(HOME_PATH / "output" / "output2.json", CSR_by_week)
 
 if __name__ == "__main__":
     main()

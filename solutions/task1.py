@@ -5,8 +5,15 @@ import pandas as pd
 from scipy.optimize import linprog
 from pathlib import Path
 import json
-from task1_domain import CSRInquiries, ShiftsDetail, ReadJson
+import pathlib
+try:
+    from solutions.utility import write_output_to_file
+    from solutions.task1_domain import CSRInquiries, ShiftsDetail, ReadJson
+except:
+    from utility import write_output_to_file
+    from task1_domain import CSRInquiries, ShiftsDetail, ReadJson
 
+HOME_PATH = pathlib.Path(__file__).parent.parent
 
 def solve(
     shifts_dict: Dict[str, List[int]], day_dict: Dict[str, List[int]]
@@ -56,26 +63,10 @@ def label_shift_to_employee(row: List[int], label: List[str], min_total_csr: int
 
 if __name__ == "__main__":
 
-    read_json = ReadJson(Path("data/json"))
+    read_json = ReadJson(HOME_PATH / "data" / "json")
     shifts_dict = read_json.read_shifts()
     day_dict = read_json.read_days()
     
     CSR_by_shift = solve(shifts_dict, day_dict)
 
-    # Print output to "../out/output2.json"
-    ## intitially print output (all in 1 line)
-    with open("output\output1.json", "w") as f:
-        json.dump(CSR_by_shift, f, indent=None)
-
-    ## read the file contents and modify them (each NV on 1 line)
-    with open("output\output1.json", "r") as f:
-        contents = f.read()
-        # Replace newlines with ',\n' except for lines that contain a list value
-        contents = contents.replace("], ", "],\n\t")
-        contents = contents.replace("{", "{\n\t")
-        contents = contents.replace("]}", "]\n}")
-        # print(contents)
-
-    ## overwrite the file with the modified contents
-    with open("output\output1.json", "w") as f:
-        f.write(contents)
+    write_output_to_file(HOME_PATH / "output" / "output1.json", CSR_by_shift)

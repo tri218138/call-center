@@ -10,18 +10,19 @@ from typing import Dict, List, Optional
 import numpy as np
 import pandas as pd
 from scipy.optimize import OptimizeResult, linprog
-try:
-    from solutions.task3_domain import CsrRequirePerDayDetails, ProblemInput, RawSchedule, ShiftSpanDetail
-    from solutions.utility import write_output_to_file
-except:
-    from task3_domain import CsrRequirePerDayDetails, ProblemInput, RawSchedule, ShiftSpanDetail
-    from utility import write_output_to_file
-    
+from solutions.task3_domain import (
+    CsrRequirePerDayDetails,
+    ProblemInput,
+    RawSchedule,
+    ShiftSpanDetail,
+)
+
+
 def main():
     HOME_PATH = pathlib.Path(__file__).parent.parent
 
     csr_day_file_path = HOME_PATH / "data" / "json" / "days.json"
-    # print(csr_day_file_path)
+    print(csr_day_file_path)
     with open(csr_day_file_path) as csr_day_file:
         csr_requirement_per_day = json.load(csr_day_file)
 
@@ -29,16 +30,14 @@ def main():
     with open(shifts_detail_file_path) as shifts_detail_file:
         shifts_detail = json.load(shifts_detail_file)
 
-    output2_file_path = HOME_PATH / "output" / "output2.json"
+    output2_file_path = HOME_PATH / "expect" / "output2.json"
     with open(output2_file_path) as quiz_2_solution_file:
         solution_2_schedule = json.load(quiz_2_solution_file)
 
     result_dict = solve(shifts_detail, csr_requirement_per_day, solution_2_schedule)
 
-    # with open(HOME_PATH / "output" / "output3.json", "w") as output_json_file:
-    #     json.dump(result_dict, output_json_file)
-
-    write_output_to_file(HOME_PATH / "output" / "output3.json", result_dict)
+    with open(HOME_PATH / "output" / "output3.json", "w") as output_json_file:
+        json.dump(result_dict, output_json_file)
 
 
 def solve(
@@ -65,11 +64,11 @@ def solve(
     a_ub3, b_ub3 = get_matrix_for_condition_csr_num_required_per_period(problem_input)
     a_ub4, b_ub4 = get_matrix_for_condition_csr_must_be_scheduled_fairly(problem_input)
 
-    total_a_ub = np.concatenate((a_ub1, a_ub2, a_ub3, a_ub4))
-    total_b_ub = np.concatenate((b_ub1, b_ub2, b_ub3, b_ub4))
+    total_a_ub = np.concatenate((a_ub1, a_ub3, a_ub4))
+    total_b_ub = np.concatenate((b_ub1, b_ub3, b_ub4))
 
     result = linprog(coefficients_c, total_a_ub, total_b_ub, integrality=1)
-    # print(result)
+    print(result)
 
     return convert_result_to_dict(result, problem_input)
 
@@ -129,7 +128,7 @@ def get_matrix_for_condition_one_day_off_per_week(
             in_eq_constraint_matrix[processing_row, optimized_var_loc] = 1
 
     in_eq_constraint_vector = np.repeat(
-        problem_input.num_of_day_per_week_j - 1, problem_input.num_of_csr_i
+        problem_input.num_of_day_per_week_j, problem_input.num_of_csr_i
     )
 
     return in_eq_constraint_matrix, in_eq_constraint_vector
@@ -249,7 +248,7 @@ def convert_i_j_k_to_1d_arr_loc(
 def convert_result_to_dict(
     result: OptimizeResult, problem_input: ProblemInput
 ) -> Dict[str, List[Optional[str]]]:
-    # print(result.x)
+    print(result.x)
     dataframe_result = convert_to_pandas(result.x, problem_input)
 
     result_dict = {}

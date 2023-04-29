@@ -1,13 +1,25 @@
 import subprocess
+import sys
 
-# Run task1.py
-subprocess.call(['python', 'solutions/task1.py'])
-print("Check output of task1 from output/output1.json")
+def run_test():
+    for i in range(1, 4):
+        print(f"Evaluating the ouput of task{i} from output/output{i}.json")
+        subprocess.call(['python', f'task{i}.py'], cwd="evaluation")
+        print("============================================")
 
-# Run task2.py
-subprocess.call(['python', 'solutions/task2.py'])
-print("Check output of task2 from output/output2.json")
+def main():
+    for i in range(1, 4):
+        print(f"Checking the output of task{i} from output/output{i}.json")
+        subprocess.call(['python', f'task{i}.py'], cwd = "solutions")
+        print("============================================")
 
-# Run task3.py
-subprocess.call(['python', 'solutions/task3.py'])
-print("Check output of task3 from output/output3.json")
+if __name__ == '__main__':
+    print("""
+    To run solve tasks:    python run.py
+    To run validate tasks: python run.py test
+    """)
+
+    if "test" in sys.argv:
+        run_test()
+    else:
+        main()

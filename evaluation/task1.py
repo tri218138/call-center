@@ -1,15 +1,18 @@
 import json
+import pathlib
 
-with open('./data/json/days.json', 'r') as f:
+HOME_PATH = pathlib.Path(__file__).parent.parent
+
+with open(HOME_PATH / 'data' / 'json' / 'days.json', 'r') as f:
     days = json.load(f)
 
-with open('./data/json/shifts.json', 'r') as f:
+with open(HOME_PATH / 'data' / 'json' / 'shifts.json', 'r') as f:
     shifts = json.load(f)
 
-with open('./data/json/week.json', 'r') as f:
+with open(HOME_PATH / 'data' / 'json' / 'week.json', 'r') as f:
     week = json.load(f)
 
-with open("output\output1.json", "r") as f:
+with open(HOME_PATH / 'output' / "output1.json", "r") as f:
     output1 = json.load(f)
 # print(days)
 J = days.keys()
@@ -29,4 +32,6 @@ for j in J:
             ret = False
             print(f"A result is incorrect because CSR does not enough at {j}, shift {idx}-th")
 if ret:
-    print("A result is correct")
+    print("Conclusion: A result is correct")
+else:
+    print("Conclusion: Some day of week does not have enough CSR")

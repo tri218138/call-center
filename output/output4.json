@@ -1,0 +1,23 @@
+{
+	"NV0": ["C1", null, "C6", "C1", null, "C4", null],
+	"NV1": ["C3", null, "C1", "C6", null, "C1", null],
+	"NV2": [null, "C6", "C1", null, null, "C1", null],
+	"NV3": ["C3", "C1", null, null, null, "C6", null],
+	"NV4": ["C6", null, null, "C1", "C3", "C1", null],
+	"NV5": [null, "C1", null, null, "C6", "C3", null],
+	"NV6": ["C1", null, null, "C6", null, "C1", null],
+	"NV7": [null, "C6", null, null, "C1", "C1", null],
+	"NV8": ["C1", "C1", "C6", "C3", null, "C4", null],
+	"NV9": [null, "C3", "C4", "C1", "C1", "C6", null],
+	"NV10": [null, "C3", "C1", "C4", "C6", "C1", null],
+	"NV11": ["C1", null, "C1", "C4", "C3", null, "C6"],
+	"NV12": ["C3", "C6", null, "C1", null, null, "C5"],
+	"NV13": ["C4", null, "C1", "C1", null, null, "C6"],
+	"NV14": ["C6", "C1", "C3", "C1", null, null, "C4"],
+	"NV15": ["C1", "C1", null, null, "C6", null, "C4"],
+	"NV16": ["C1", null, "C6", null, null, null, "C1"],
+	"NV17": [null, "C3", "C6", null, "C1", null, "C1"],
+	"NV18": [null, "C3", "C4", "C6", "C1", null, "C1"],
+	"NV19": [null, "C1", null, "C6", "C4", null, "C1"],
+	"NV20": [null, null, "C1", null, "C6", null, "C1"]
+}
