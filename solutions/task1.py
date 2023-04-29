@@ -1,64 +1,81 @@
-import cplex
-from docplex.mp.model import Model
-
-# load data
+from functools import reduce
+from typing import List, Dict, Optional
+import numpy as np
+import pandas as pd
+from scipy.optimize import linprog
+from pathlib import Path
 import json
-with open('./data/json/days.json', 'r') as f:
-    days = json.load(f)
+from task1_domain import CSRInquiries, ShiftsDetail, ReadJson
 
-with open('./data/json/shifts.json', 'r') as f:
-    shifts = json.load(f)
 
-# read data
-J = days.keys()
-K = shifts.keys()
+def solve(
+    shifts_dict: Dict[str, List[int]], day_dict: Dict[str, List[int]]
+) -> Dict[str, List[Optional[str]]]:
+    
+    shifts_detail = ShiftsDetail(shifts_dict)
+    csr_inquiries = CSRInquiries(day_dict)
 
-# model
-model = Model(name='Q1')
+    coefficients_c = np.ones(shifts_detail.num_of_shifts)
+    stat = [
+        min_csr_of_a_day(coefficients_c, csr_inquiries, shifts_detail, day_j).tolist()
+        for day_j in range(csr_inquiries.num_of_days)
+    ]
 
-# result
-result = []
-maxCSR = 0
+    min_total_csr = max([reduce(lambda pre, cur: pre + cur, days, 0) for days in stat])
 
-for j in J:
-    # variables
-    x = {}
-    for k in K:
-        x[k] = model.integer_var(
-            lb=0, ub=cplex.infinity, name='x_{}'.format(k))
+    employee_assignment = np.array(
+        [label_shift_to_employee(shift, shifts_detail.columns, min_total_csr) for shift in stat]
+    ).T.tolist()
 
-    # objective
-    model.minimize(sum([x[k] for k in K]))
+    return {f"NV{i}": em for i, em in enumerate(employee_assignment)}
 
-    # constraints
-    for t in range(13):
-        sum_t = sum([shifts[k][t]*x[k] for k in K])
-        model.add_constraint(sum_t >= days[j][t])
 
-    # solve
-    solution = model.solve()
+def min_csr_of_a_day(
+    coefficients_c: np.ndarray, csr_inquiries: CSRInquiries, shifts_detail: ShiftsDetail, day_j: int
+) -> np.ndarray:
+    constraint_matrix, constraint_vector = constraint_min_CSR_of_a_period(
+        csr_inquiries, shifts_detail, day_j
+    )
+    return (
+        linprog(coefficients_c, constraint_matrix, constraint_vector, integrality=3)
+        .x.astype(int)
+    )
 
-    result.append([x[k].solution_value for k in K])
-    maxCSR = max(maxCSR, int(model.objective_value))
+def constraint_min_CSR_of_a_period(
+    csr_inquiries: CSRInquiries, shifts_detail: ShiftsDetail, at: int
+):
+    constraint_matrix = -1 * shifts_detail._shifts_detail
+    constraint_vector = -1 * csr_inquiries._csr_inquiries[at]
+    return constraint_matrix.T, constraint_vector
 
-    model.clear()
+def label_shift_to_employee(row: List[int], label: List[str], min_total_csr: int):
+    assert len(row) == len(label)
+    csr_per_day = reduce(lambda pre, cur: pre + cur, row, 0)
+    label = [[name] * x for x, name in zip(row, label)] + [(min_total_csr - csr_per_day) * [None]]
+    return reduce(lambda pre, cur: pre + cur, label, [])
 
-# output
-assign = {}
-for csr in range(1, maxCSR + 1):
-    assign['NV{}'.format(csr)] = []
+if __name__ == "__main__":
 
-for j in range(len(J)):
-    csr = 1
-    for k in range(len(result[j])):
-        for res in range(int(result[j][k])):
-            assign['NV{}'.format(csr)].append('C{}'.format(k + 1))
-            csr += 1
-    while csr <= maxCSR:
-        assign['NV{}'.format(csr)].append(None)
-        csr += 1
+    read_json = ReadJson(Path("data/json"))
+    shifts_dict = read_json.read_shifts()
+    day_dict = read_json.read_days()
+    
+    CSR_by_shift = solve(shifts_dict, day_dict)
 
-output = json.dumps(assign)
+    # Print output to "../out/output2.json"
+    ## intitially print output (all in 1 line)
+    with open("output\output1.json", "w") as f:
+        json.dump(CSR_by_shift, f, indent=None)
 
-with open("output\output1.json", "w") as outfile:
-    outfile.write(output)
+    ## read the file contents and modify them (each NV on 1 line)
+    with open("output\output1.json", "r") as f:
+        contents = f.read()
+        # Replace newlines with ',\n' except for lines that contain a list value
+        contents = contents.replace("], ", "],\n\t")
+        contents = contents.replace("{", "{\n\t")
+        contents = contents.replace("]}", "]\n}")
+        # print(contents)
+
+    ## overwrite the file with the modified contents
+    with open("output\output1.json", "w") as f:
+        f.write(contents)

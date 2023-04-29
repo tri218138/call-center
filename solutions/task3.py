@@ -4,44 +4,56 @@ Task 3: Scheduling CSR for 1 week, maximize workload fairness
 import itertools
 import json
 import math
-from pathlib import Path
+import pathlib
+from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
-from scipy.optimize import linprog, OptimizeResult
-
-from task3_domain import CsrRequirePerDayDetails, ShiftSpanDetail, RawSchedule, ProblemInput
+from scipy.optimize import OptimizeResult, linprog
+from task3_domain import CsrRequirePerDayDetails, ProblemInput, RawSchedule, ShiftSpanDetail
 
 
 HOME_PATH = Path(__file__).parent.parent
 
 
 def main():
-    csr_day_file = HOME_PATH / "data" / "json" / "days.json"
-    csr_requirement_per_day = CsrRequirePerDayDetails.from_json_file(csr_day_file)
+    HOME_PATH = pathlib.Path(__file__).parent.parent
 
-    shifts_detail_file = HOME_PATH / "data" / "json" / "shifts.json"
-    shifts_detail = ShiftSpanDetail.from_json_file(shifts_detail_file)
+    csr_day_file_path = HOME_PATH / "data" / "json" / "days.json"
+    # print(csr_day_file_path)
+    with open(csr_day_file_path) as csr_day_file:
+        csr_requirement_per_day = json.load(csr_day_file)
 
-    output2_file = HOME_PATH / "expect" / "output2.json"
-    raw_schedules = RawSchedule.from_json_file(output2_file)
+    shifts_detail_file_path = HOME_PATH / "data" / "json" / "shifts.json"
+    with open(shifts_detail_file_path) as shifts_detail_file:
+        shifts_detail = json.load(shifts_detail_file)
 
-    solve_lp_problem(
-        ProblemInput(
-            shift_span_detail=shifts_detail,
-            csr_requirement_detail=csr_requirement_per_day,
-            raw_schedules=raw_schedules,
-        )
-    )
+    output2_file_path = HOME_PATH / "expect" / "output2.json"
+    with open(output2_file_path) as quiz_2_solution_file:
+        solution_2_schedule = json.load(quiz_2_solution_file)
+
+    result_dict = solve(shifts_detail, csr_requirement_per_day, solution_2_schedule)
+
+    with open(HOME_PATH / "output" / "output3.json", "w") as output_json_file:
+        json.dump(result_dict, output_json_file)
 
 
-def solve_lp_problem(problem_input: ProblemInput):
+def solve(
+    shifts_detail: Dict[str, List[int]],
+    days_dict: Dict[str, List[int]],
+    solution_2_schedule: Dict[str, List[Optional[str]]],
+):
     """
     The variables would be structured into a 1D array, as follows:
     [x_{1,1,1} ; x_{1,1,2} ; ... ; x{1,2,1} ; x{1,2,2} ; ... ; x_{2,1,1} ; x_{2,1,2} ; ... ]
 
     :return:
     """
+    problem_input = ProblemInput(
+        shift_span_detail=ShiftSpanDetail(shifts_detail),
+        csr_requirement_detail=CsrRequirePerDayDetails(days_dict),
+        raw_schedules=RawSchedule(solution_2_schedule),
+    )
 
     coefficients_c = np.ones(problem_input.num_of_optimized_vars)
 
@@ -54,8 +66,10 @@ def solve_lp_problem(problem_input: ProblemInput):
     total_b_ub = np.concatenate((b_ub1, b_ub2, b_ub3, b_ub4))
 
     result = linprog(coefficients_c, total_a_ub, total_b_ub, integrality=1)
+    # print(result)
 
     write_result(result, problem_input)
+    return convert_result_to_dict(result, problem_input)
 
 
 def get_matrix_for_condition_one_shift_per_day(
@@ -230,7 +244,23 @@ def convert_i_j_k_to_1d_arr_loc(
     )
 
 
-def convert_to_pandas(solution: np.array, problem_input: ProblemInput) -> pd.DataFrame:
+def convert_result_to_dict(
+    result: OptimizeResult, problem_input: ProblemInput
+) -> Dict[str, List[Optional[str]]]:
+    # print(result.x)
+    dataframe_result = convert_to_pandas(result.x, problem_input)
+
+    result_dict = {}
+    transpose_result = dataframe_result.transpose()
+    for column in transpose_result:
+        result_dict[column] = [
+            None if item == "" else item for item in transpose_result[column].values
+        ]
+
+    return result_dict
+
+
+def convert_to_pandas(solution: np.ndarray, problem_input: ProblemInput) -> pd.DataFrame:
     reshaped: np.ndarray = solution.reshape(
         (
             problem_input.num_of_csr_i,
