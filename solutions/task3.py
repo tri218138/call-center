@@ -31,8 +31,24 @@ def main():
 
     result_dict = solve(shifts_detail, csr_requirement_per_day, solution_2_schedule)
 
-    with open(HOME_PATH / "output" / "output3.json", "w") as output_json_file:
-        json.dump(result_dict, output_json_file)
+    # with open(HOME_PATH / "output" / "output3.json", "w") as output_json_file:
+    #     json.dump(result_dict, output_json_file)
+
+    with open(HOME_PATH / "output" / "output3.json", "w") as f:
+        json.dump(result_dict, f, indent=None)
+
+    ## read the file contents and modify them (each NV on 1 line)
+    with open(HOME_PATH / "output" / "output3.json", "r") as f:
+        contents = f.read()
+        # Replace newlines with ',\n' except for lines that contain a list value
+        contents = contents.replace("], ", "],\n\t")
+        contents = contents.replace("{", "{\n\t")
+        contents = contents.replace("]}", "]\n}")
+        # print(contents)
+
+    ## overwrite the file with the modified contents
+    with open(HOME_PATH / "output" / "output3.json", "w") as f:
+        f.write(contents)
 
 
 def solve(
@@ -65,7 +81,6 @@ def solve(
     result = linprog(coefficients_c, total_a_ub, total_b_ub, integrality=1)
     # print(result)
 
-    write_result(result, problem_input)
     return convert_result_to_dict(result, problem_input)
 
 
@@ -281,20 +296,6 @@ def convert_to_pandas(solution: np.ndarray, problem_input: ProblemInput) -> pd.D
         parsed_result.iloc[csr_i, day_j] = shift_names[shift_k]
 
     return parsed_result
-
-
-def write_result(result: OptimizeResult, problem_input: ProblemInput):
-    dataframe_result = convert_to_pandas(result.x, problem_input)
-
-    result_dict = {}
-    transpose_result = dataframe_result.transpose()
-    for column in transpose_result:
-        result_dict[column] = [
-            None if item == "" else item for item in transpose_result[column].values
-        ]
-
-    with open(HOME_PATH / "output" / "output3.json", "w") as output_json_file:
-        json.dump(result_dict, output_json_file)
 
 
 if __name__ == "__main__":
