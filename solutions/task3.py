@@ -13,9 +13,6 @@ from scipy.optimize import OptimizeResult, linprog
 from task3_domain import CsrRequirePerDayDetails, ProblemInput, RawSchedule, ShiftSpanDetail
 
 
-HOME_PATH = Path(__file__).parent.parent
-
-
 def main():
     HOME_PATH = pathlib.Path(__file__).parent.parent
 
